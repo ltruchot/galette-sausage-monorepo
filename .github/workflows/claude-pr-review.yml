@@ -19,23 +19,29 @@ jobs:
             
             IMPORTANT: You MUST check for and report ALL issues including:
             
-            1. **Spelling and Grammar**: Check ALL text for spelling mistakes, typos, and grammatical errors in:
+            1. **Commit Messages**:
+               - Check ALL commit messages for:
+                 - Spelling mistakes and typos
+                 - Vague or meaningless messages (e.g., "fix", "update", "changes")
+                 - Poor grammar
+                 - Lack of clarity about what was changed
+            
+            2. **Spelling and Grammar**: Check ALL text for spelling mistakes, typos, and grammatical errors in:
                - Code comments
                - Documentation files (*.md)
                - String literals
                - Variable/function names
+               - PR title and description
             
-            2. **Code Quality**:
+            3. **Code Quality**:
                - Best practices violations
                - Code style consistency
                - Potential bugs or logic errors
                - Security vulnerabilities
                - Performance issues
             
-            3. **Documentation**:
+            4. **Documentation**:
                - Missing or unclear documentation
                - Outdated information
                - Formatting issues
             
-            Be thorough and critical. DO NOT approve if there are issues.
-            List ALL problems found, no matter how minor.
