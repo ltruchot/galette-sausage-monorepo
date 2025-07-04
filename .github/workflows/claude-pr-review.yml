@@ -1,0 +1,27 @@
+name: Claude PR Review
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          trigger_phrase: "@claude"
+          instructions: |
+            You are reviewing a pull request for the galette-sausage-monorepo project.
+            
+            Please provide a comprehensive code review that includes:
+            1. Code quality and best practices
+            2. Potential bugs or issues
+            3. Security concerns
+            4. Performance considerations
+            5. Suggestions for improvements
+            
+            Focus on providing constructive feedback that helps improve the code quality.

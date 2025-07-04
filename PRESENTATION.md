@@ -93,7 +93,7 @@ Deliver Galette-Sausage all over town
     
 - Frontend features:
   - Header/Footer (login state and other info)
-  - Home: title, cool explanation of service, could contain main form and invitation to login/signup
+  - Home: title, cool explanation prensentig product, invitation to login/signup or order, or view current orders 
   - Login/signup form (no check except required-valid email-strong password, frontend validation, same as backend)
   - Consumer form to order:
     - Implements business rules
@@ -128,6 +128,7 @@ Deliver Galette-Sausage all over town
 ### Quality
 - API local test: HTTP file
 - 80% test coverage
+- well formatted and linted
 - No comments in code (except crazy hacks)
 - No crazy hacks
 
@@ -143,7 +144,7 @@ Deliver Galette-Sausage all over town
 
 ### Environments:
 - Local: DB on Docker, local pnpm, local Java
-- Prod: render.com components
+- Prod: render.com services
 
 
 
