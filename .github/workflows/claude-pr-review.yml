@@ -17,11 +17,25 @@ jobs:
           instructions: |
             You are reviewing a pull request for the galette-sausage-monorepo project.
             
-            Please provide a comprehensive code review that includes:
-            1. Code quality and best practices
-            2. Potential bugs or issues
-            3. Security concerns
-            4. Performance considerations
-            5. Suggestions for improvements
+            IMPORTANT: You MUST check for and report ALL issues including:
             
-            Focus on providing constructive feedback that helps improve the code quality.
+            1. **Spelling and Grammar**: Check ALL text for spelling mistakes, typos, and grammatical errors in:
+               - Code comments
+               - Documentation files (*.md)
+               - String literals
+               - Variable/function names
+            
+            2. **Code Quality**:
+               - Best practices violations
+               - Code style consistency
+               - Potential bugs or logic errors
+               - Security vulnerabilities
+               - Performance issues
+            
+            3. **Documentation**:
+               - Missing or unclear documentation
+               - Outdated information
+               - Formatting issues
+            
+            Be thorough and critical. DO NOT approve if there are issues.
+            List ALL problems found, no matter how minor.
