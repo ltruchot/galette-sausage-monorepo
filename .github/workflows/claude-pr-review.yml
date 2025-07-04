@@ -1,27 +1,65 @@
 name: Claude PR Review
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, ready_for_review]
     branches:
       - main
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
   claude-review:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for proper git operations
       - uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          trigger_phrase: "@claude"
-          instructions: |
+          direct_prompt: |
+            Review this pull request comprehensively. Check for:
+            1. ALL commit messages - report any spelling mistakes, vague messages, or poor grammar
+            2. ALL spelling and grammar errors in code, comments, and documentation
+            3. Code quality issues, bugs, and best practices violations
+            4. Missing or unclear documentation
+            
+            Be EXTREMELY critical and report EVERY issue found, no matter how minor.
+          custom_instructions: |
             You are reviewing a pull request for the galette-sausage-monorepo project.
             
-            Please provide a comprehensive code review that includes:
-            1. Code quality and best practices
-            2. Potential bugs or issues
-            3. Security concerns
-            4. Performance considerations
-            5. Suggestions for improvements
+            IMPORTANT: You MUST check for and report ALL issues including:
             
-            Focus on providing constructive feedback that helps improve the code quality.
+            1. **Commit Messages**:
+               - Check ALL commit messages for:
+                 - Spelling mistakes and typos
+                 - Vague or meaningless messages (e.g., "fix", "update", "changes")
+                 - Poor grammar
+                 - Lack of clarity about what was changed
+            
+            2. **Spelling and Grammar**: Check ALL text for spelling mistakes, typos, and grammatical errors in:
+               - Code comments
+               - Documentation files (*.md)
+               - String literals
+               - Variable/function names
+               - PR title and description
+            
+            3. **Code Quality**:
+               - Best practices violations
+               - Code style consistency
+               - Potential bugs or logic errors
+               - Security vulnerabilities
+               - Performance issues
+            
+            4. **Documentation**:
+               - Missing or unclear documentation
+               - Outdated information
+               - Formatting issues
+            
+            Be EXTREMELY thorough and critical. DO NOT approve if there are ANY issues.
+            List ALL problems found, no matter how minor.
+            If commit messages are poor quality, this alone is reason to request changes.
