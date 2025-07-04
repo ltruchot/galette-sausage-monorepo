@@ -62,8 +62,8 @@
    HTTPS: / Cloudfront
   - DB, Java Backend, Static Astro Pages: render.com
   - Warning: mandatory variable naming
-  - Backend: don’t forget DB and a minimal CORS conf (env.production)
-  - Frontend:
+  - Backend: don’t forget DB and CORS conf (env.production)
+  - Frontend: don’t forget public api conf (apps/order-webapp-frontend/.env.production)
 
 
 ### Environments:
