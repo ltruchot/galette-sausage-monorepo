@@ -3,7 +3,7 @@
 Aka B.I.G.S: Breton Infamous Galette Sausage
 
 ## About Me and Disclaimer
-- Loïc TRUCHOT from Zeemutable
+- Loïc TRUCHOT from Zeemutable, Shodo contractor
 - Simple front-end developer, knows nothing, learns every day
 - English bad, tyypinng bad, Mac bad
 - AI tool early adopter, not an expert
