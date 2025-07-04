@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   claude-review:
     runs-on: ubuntu-latest
@@ -13,8 +18,14 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          trigger_phrase: "@claude-review"
-          direct_prompt: "Review this PR comprehensively and report all issues found."
+          direct_prompt: |
+            Review this pull request comprehensively. Check for:
+            1. ALL commit messages - report any spelling mistakes, vague messages, or poor grammar
+            2. ALL spelling and grammar errors in code, comments, and documentation
+            3. Code quality issues, bugs, and best practices violations
+            4. Missing or unclear documentation
+            
+            Be EXTREMELY critical and report EVERY issue found, no matter how minor.
           custom_instructions: |
             You are reviewing a pull request for the galette-sausage-monorepo project.
             
@@ -49,14 +60,3 @@ jobs:
             Be EXTREMELY thorough and critical. DO NOT approve if there are ANY issues.
             List ALL problems found, no matter how minor.
             If commit messages are poor quality, this alone is reason to request changes.
-      - name: Comment on PR to trigger Claude
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '@claude-review Please review this PR for all issues including commit messages, spelling, grammar, and code quality.'
-            })
