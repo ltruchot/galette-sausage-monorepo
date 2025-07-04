@@ -1,7 +1,7 @@
 {
     "permissions": {
       "deny": [
-        "Read(PRESENTATION.md, .env.production, .env)"
+        "Read(PRESENTATION.md, CLAUDE_PR_REVIEW.md, .env.production, .env)"
       ]
     }
   }
