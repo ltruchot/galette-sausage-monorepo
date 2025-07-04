@@ -1,0 +1,118 @@
+---
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Order delicious Galette-Sausage for delivery" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-gray-50 flex flex-col">
+    <header class="bg-galette-700 text-white shadow-lg">
+      <nav class="container mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <a href="/" class="text-2xl font-bold">🥖 Galette-Sausage</a>
+          <ul class="flex space-x-6">
+            <li>
+              <a 
+                href="/" 
+                class={`hover:text-galette-200 transition ${currentPath === '/' ? 'text-galette-200' : ''}`}
+              >
+                Home
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/order" 
+                class={`hover:text-galette-200 transition ${currentPath === '/order' ? 'text-galette-200' : ''}`}
+              >
+                Order
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/basket" 
+                class={`hover:text-galette-200 transition ${currentPath === '/basket' ? 'text-galette-200' : ''}`}
+              >
+                Basket <span id="basket-count" class="bg-galette-500 px-2 py-1 rounded-full text-xs"></span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/orders" 
+                class={`hover:text-galette-200 transition ${currentPath === '/orders' ? 'text-galette-200' : ''}`}
+              >
+                My Orders
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <main class="flex-grow">
+      <slot />
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+      <div class="container mx-auto px-4 text-center">
+        <p class="mb-2">🥖 Galette-Sausage - Authentic Breton Delivery</p>
+        <p class="text-sm text-gray-400">Fresh galettes delivered in 30 minutes!</p>
+      </div>
+    </footer>
+
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+  </body>
+</html>
+
+<script>
+  // Update basket count on page load
+  async function updateBasketCount() {
+    try {
+      const response = await fetch('/api/basket', {
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const countEl = document.getElementById('basket-count');
+        if (countEl && data.itemCount > 0) {
+          countEl.textContent = data.itemCount.toString();
+        } else if (countEl) {
+          countEl.style.display = 'none';
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch basket count:', error);
+    }
+  }
+
+  updateBasketCount();
+
+  // Toast notification system
+  window.showToast = function(message: string, type: 'success' | 'error' = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `p-4 rounded-lg shadow-lg text-white mb-2 transition-all ${
+      type === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+    toast.textContent = message;
+    
+    const container = document.getElementById('toast-container');
+    if (container) {
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  };
+</script>

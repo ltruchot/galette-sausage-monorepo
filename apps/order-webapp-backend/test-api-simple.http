@@ -1,0 +1,77 @@
+### Get full menu (PUBLIC)
+GET http://localhost:8080/api/menu
+
+### Get galette types only (PUBLIC)
+GET http://localhost:8080/api/menu/galette-types
+
+### Get sauces only (PUBLIC)
+GET http://localhost:8080/api/menu/sauces
+
+### Get toppings only (PUBLIC)
+GET http://localhost:8080/api/menu/toppings
+
+### Get current basket
+GET http://localhost:8080/api/basket
+Cookie: JSESSIONID={{sessionId}}
+
+### Add item to basket - Classic galette with mustard and cheese
+POST http://localhost:8080/api/basket/add
+Content-Type: application/json
+Cookie: JSESSIONID={{sessionId}}
+
+{
+  "galetteTypeId": 1,
+  "sauceIds": [1],
+  "toppingQuantities": {
+    "1": 1
+  },
+  "quantity": 1
+}
+
+### Add item to basket - Merguez with ketchup and jalapeños (2x)
+POST http://localhost:8080/api/basket/add
+Content-Type: application/json
+Cookie: JSESSIONID={{sessionId}}
+
+{
+  "galetteTypeId": 2,
+  "sauceIds": [2],
+  "toppingQuantities": {
+    "5": 2
+  },
+  "quantity": 1
+}
+
+### Update item quantity
+PATCH http://localhost:8080/api/basket/item/1/quantity?quantity=2
+Cookie: JSESSIONID={{sessionId}}
+
+### Remove item from basket
+DELETE http://localhost:8080/api/basket/item/1
+Cookie: JSESSIONID={{sessionId}}
+
+### Clear basket
+DELETE http://localhost:8080/api/basket/clear
+Cookie: JSESSIONID={{sessionId}}
+
+### Place order
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+Cookie: JSESSIONID={{sessionId}}
+
+{
+  "name": "Jean Dupont",
+  "phone": "+33 6 12 34 56 78",
+  "address": "12 Rue de la République, 35000 Rennes",
+  "notes": "3rd floor, door code: 1234"
+}
+
+### Get my orders
+GET http://localhost:8080/api/orders/my-orders
+Cookie: JSESSIONID={{sessionId}}
+
+### Health check (try different paths)
+GET http://localhost:8080/actuator/health
+
+### Alternative health check path
+GET http://localhost:8080/api/actuator/health
