@@ -1,0 +1,332 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Order - Galette-Sausage">
+  <section class="py-12">
+    <div class="container mx-auto px-4">
+      <h1 class="text-4xl font-bold text-center text-galette-800 mb-8">
+        Create Your Galette
+      </h1>
+
+      <div class="max-w-4xl mx-auto">
+        <form id="galette-form" class="space-y-8">
+          <!-- Galette Type Selection -->
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+              1. Choose Your Galette (4€)
+            </h2>
+            <div class="space-y-3" id="galette-types">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Sauces Selection -->
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+              2. Select Sauces (0.50€ each, max 2)
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="sauces">
+              <!-- Will be populated by JavaScript -->
+            </div>
+            <p class="text-sm text-gray-600 mt-2">Maximum 2 sauces allowed</p>
+          </div>
+
+          <!-- Toppings Selection -->
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+              3. Add Toppings (1€ per portion, max 3 types)
+            </h2>
+            <div class="space-y-4" id="toppings">
+              <!-- Will be populated by JavaScript -->
+            </div>
+            <p class="text-sm text-gray-600 mt-2">Maximum 3 different toppings, 1-2 portions each</p>
+          </div>
+
+          <!-- Quantity -->
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+              4. Quantity
+            </h2>
+            <div class="flex items-center space-x-4">
+              <button type="button" id="qty-minus" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                -
+              </button>
+              <input 
+                type="number" 
+                id="quantity" 
+                name="quantity" 
+                value="1" 
+                min="1" 
+                max="10"
+                class="w-20 text-center px-3 py-2 border border-gray-300 rounded-md"
+                readonly
+              />
+              <button type="button" id="qty-plus" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                +
+              </button>
+            </div>
+          </div>
+
+          <!-- Price Summary -->
+          <div class="bg-galette-100 rounded-lg p-6">
+            <h3 class="text-xl font-semibold text-galette-800 mb-2">Total Price</h3>
+            <p class="text-3xl font-bold text-galette-700" id="total-price">0.00€</p>
+          </div>
+
+          <!-- Add to Basket Button -->
+          <button
+            type="submit"
+            class="w-full bg-galette-600 text-white font-semibold py-4 px-6 rounded-lg hover:bg-galette-700 transition duration-200 text-lg"
+          >
+            Add to Basket
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  interface MenuItem {
+    id: number;
+    name: string;
+    price: string;
+    description?: string;
+  }
+
+  interface MenuData {
+    galetteTypes: MenuItem[];
+    sauces: MenuItem[];
+    toppings: MenuItem[];
+  }
+
+  let menuData: MenuData;
+  let selectedGalette: number | null = null;
+  let selectedSauces: number[] = [];
+  let toppingQuantities: { [key: number]: number } = {};
+
+  // Fetch menu data
+  async function loadMenu() {
+    try {
+      const response = await fetch('/api/menu');
+      if (!response.ok) throw new Error('Failed to load menu');
+      menuData = await response.json();
+      renderMenu();
+    } catch (error) {
+      window.showToast('Failed to load menu', 'error');
+    }
+  }
+
+  // Render menu items
+  function renderMenu() {
+    // Render galette types
+    const galetteContainer = document.getElementById('galette-types');
+    if (galetteContainer && menuData.galetteTypes) {
+      galetteContainer.innerHTML = menuData.galetteTypes.map(galette => `
+        <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-galette-50">
+          <input 
+            type="radio" 
+            name="galette" 
+            value="${galette.id}"
+            class="mr-3"
+            onchange="selectGalette(${galette.id})"
+          />
+          <div class="flex-grow">
+            <span class="font-medium">${galette.name}</span>
+            ${galette.description ? `<p class="text-sm text-gray-600">${galette.description}</p>` : ''}
+          </div>
+          <span class="text-galette-700 font-semibold">${galette.price}€</span>
+        </label>
+      `).join('');
+    }
+
+    // Render sauces
+    const saucesContainer = document.getElementById('sauces');
+    if (saucesContainer && menuData.sauces) {
+      saucesContainer.innerHTML = menuData.sauces.map(sauce => `
+        <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-galette-50">
+          <input 
+            type="checkbox" 
+            name="sauce" 
+            value="${sauce.id}"
+            class="mr-2"
+            onchange="toggleSauce(${sauce.id})"
+          />
+          <span class="flex-grow">${sauce.name}</span>
+          <span class="text-galette-700 text-sm">${sauce.price}€</span>
+        </label>
+      `).join('');
+    }
+
+    // Render toppings
+    const toppingsContainer = document.getElementById('toppings');
+    if (toppingsContainer && menuData.toppings) {
+      toppingsContainer.innerHTML = menuData.toppings.map(topping => `
+        <div class="flex items-center justify-between p-4 border rounded-lg">
+          <div>
+            <span class="font-medium">${topping.name}</span>
+            <span class="text-galette-700 ml-2">${topping.price}€/portion</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button 
+              type="button"
+              onclick="updateTopping(${topping.id}, -1)"
+              class="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300"
+            >
+              -
+            </button>
+            <span id="topping-qty-${topping.id}" class="w-8 text-center">0</span>
+            <button 
+              type="button"
+              onclick="updateTopping(${topping.id}, 1)"
+              class="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Selection handlers
+  window.selectGalette = function(id: number) {
+    selectedGalette = id;
+    updatePrice();
+  };
+
+  window.toggleSauce = function(id: number) {
+    const index = selectedSauces.indexOf(id);
+    if (index > -1) {
+      selectedSauces.splice(index, 1);
+    } else {
+      if (selectedSauces.length >= 2) {
+        window.showToast('Maximum 2 sauces allowed', 'error');
+        const checkbox = document.querySelector(`input[name="sauce"][value="${id}"]`) as HTMLInputElement;
+        if (checkbox) checkbox.checked = false;
+        return;
+      }
+      selectedSauces.push(id);
+    }
+    updatePrice();
+  };
+
+  window.updateTopping = function(id: number, change: number) {
+    const currentQty = toppingQuantities[id] || 0;
+    const newQty = currentQty + change;
+    
+    if (newQty < 0) return;
+    if (newQty > 2) {
+      window.showToast('Maximum 2 portions per topping', 'error');
+      return;
+    }
+    
+    if (newQty === 0) {
+      delete toppingQuantities[id];
+    } else {
+      // Check if adding new topping type
+      if (currentQty === 0 && Object.keys(toppingQuantities).length >= 3) {
+        window.showToast('Maximum 3 different toppings allowed', 'error');
+        return;
+      }
+      toppingQuantities[id] = newQty;
+    }
+    
+    const qtySpan = document.getElementById(`topping-qty-${id}`);
+    if (qtySpan) qtySpan.textContent = newQty.toString();
+    updatePrice();
+  };
+
+  // Quantity controls
+  document.getElementById('qty-minus')?.addEventListener('click', () => {
+    const input = document.getElementById('quantity') as HTMLInputElement;
+    const newVal = Math.max(1, parseInt(input.value) - 1);
+    input.value = newVal.toString();
+    updatePrice();
+  });
+
+  document.getElementById('qty-plus')?.addEventListener('click', () => {
+    const input = document.getElementById('quantity') as HTMLInputElement;
+    const newVal = Math.min(10, parseInt(input.value) + 1);
+    input.value = newVal.toString();
+    updatePrice();
+  });
+
+  // Calculate and update price
+  function updatePrice() {
+    let price = 0;
+    
+    // Galette price
+    if (selectedGalette && menuData) {
+      const galette = menuData.galetteTypes.find(g => g.id === selectedGalette);
+      if (galette) price += parseFloat(galette.price);
+    }
+    
+    // Sauces price
+    selectedSauces.forEach(sauceId => {
+      const sauce = menuData.sauces.find(s => s.id === sauceId);
+      if (sauce) price += parseFloat(sauce.price);
+    });
+    
+    // Toppings price
+    Object.entries(toppingQuantities).forEach(([toppingId, qty]) => {
+      const topping = menuData.toppings.find(t => t.id === parseInt(toppingId));
+      if (topping) price += parseFloat(topping.price) * qty;
+    });
+    
+    // Multiply by quantity
+    const quantity = parseInt((document.getElementById('quantity') as HTMLInputElement).value);
+    const totalPrice = price * quantity;
+    
+    const priceEl = document.getElementById('total-price');
+    if (priceEl) priceEl.textContent = `${totalPrice.toFixed(2)}€`;
+  }
+
+  // Form submission
+  document.getElementById('galette-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    if (!selectedGalette) {
+      window.showToast('Please select a galette type', 'error');
+      return;
+    }
+    
+    const basketItem = {
+      galetteTypeId: selectedGalette,
+      sauceIds: selectedSauces,
+      toppingQuantities: toppingQuantities,
+      quantity: parseInt((document.getElementById('quantity') as HTMLInputElement).value)
+    };
+    
+    try {
+      const response = await fetch('/api/basket/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(basketItem)
+      });
+      
+      if (response.ok) {
+        window.showToast('Added to basket!', 'success');
+        // Reset form
+        selectedGalette = null;
+        selectedSauces = [];
+        toppingQuantities = {};
+        (document.getElementById('galette-form') as HTMLFormElement).reset();
+        renderMenu();
+        updatePrice();
+        // Update basket count
+        (window as any).updateBasketCount?.();
+      } else {
+        const error = await response.text();
+        window.showToast(error || 'Failed to add to basket', 'error');
+      }
+    } catch (error) {
+      window.showToast('Error adding to basket', 'error');
+    }
+  });
+
+  // Load menu on page load
+  loadMenu();
+</script>

@@ -1,0 +1,12 @@
+{
+  "name": "@galette-sausage/backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend API for Galette Sausage orders",
+  "scripts": {
+    "dev": "mvn spring-boot:run",
+    "build": "mvn clean package",
+    "test": "mvn test",
+    "clean": "mvn clean"
+  }
+}
