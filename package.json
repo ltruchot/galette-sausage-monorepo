@@ -8,10 +8,17 @@
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
-    "clean": "pnpm -r run clean"
+    "clean": "pnpm -r run clean",
+    "db:start": "docker-compose up -d",
+    "db:stop": "docker-compose down",
+    "backend:dev": "cd apps/order-webapp-backend && mvn spring-boot:run -Dspring-boot.run.profiles=local",
+    "frontend:dev": "cd apps/order-webapp-frontend && pnpm dev",
+    "start:all": "./scripts/start-all.sh",
+    "stop:all": "pnpm run db:stop"
   },
   "devDependencies": {
-    "@types/node": "^20.11.30"
+    "@types/node": "^20.11.30",
+    "concurrently": "^9.2.0"
   },
   "engines": {
     "node": ">=18.0.0",

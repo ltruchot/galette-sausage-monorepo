@@ -29,6 +29,14 @@ public class MenuDataInitializer implements CommandLineRunner {
         initializeGaletteTypes();
         initializeSauces();
         initializeToppings();
+        
+        System.out.println("\n========================================");
+        System.out.println("🥞 GALETTE-SAUSAGE BACKEND STARTED! 🥞");
+        System.out.println("========================================");
+        System.out.println("✅ Backend API: http://localhost:8080/api");
+        System.out.println("✅ Health check: http://localhost:8080/api/actuator/health");
+        System.out.println("✅ Menu endpoint: http://localhost:8080/api/menu");
+        System.out.println("========================================\n");
     }
 
     private void initializeGaletteTypes() {
